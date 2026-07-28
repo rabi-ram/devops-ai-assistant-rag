@@ -1,0 +1,15 @@
+Kubernetes is an open-source container orchestration platform.
+
+A Pod is the smallest deployable unit in Kubernetes.
+
+A Deployment manages Pods and ReplicaSets.
+
+A Service exposes Pods over the network.
+
+ConfigMaps store configuration.
+
+Secrets store sensitive information.
+
+Ingress provides HTTP and HTTPS routing.
+
+Namespaces logically separate workloads.

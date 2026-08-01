@@ -18,11 +18,11 @@ class LLMService:
             temperature=0.2,
         )
 
-    def ask(self, question: str) -> str:
+    def ask(self, prompt: str) -> str:
         """
-        Send a question to the LLM and return the response.
+        Send a prompt to the LLM and return the generated response.
         """
-        response = self.llm.invoke(question)
+        response = self.llm.invoke(prompt)
 
         return response.content
 

@@ -5,6 +5,12 @@ class ChatRequest(BaseModel):
     question: str
 
 
+class Source(BaseModel):
+    file: str
+    page: int
+
+
 class ChatResponse(BaseModel):
     answer: str
+    sources: list[Source]
     

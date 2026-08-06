@@ -1,5 +1,8 @@
+from pathlib import Path
+
+from app.prompts.rag_prompt import rag_prompt
 from app.services.llm_service import llm_service
-from app.vectorstore.chroma_store import chroma_store
+from app.services.retrieval_service import retrieval_service
 
 
 class RAGService:
@@ -9,30 +12,34 @@ class RAGService:
 
     def ask(self, question: str):
 
-        docs = chroma_store.similarity_search(question)
+        docs = retrieval_service.retrieve(question)
 
         context = "\n\n".join(
             doc.page_content for doc in docs
         )
 
-        prompt = f"""
-You are an expert DevOps AI assistant.
+        prompt = rag_prompt.format(
+            context=context,
+            question=question,
+        )
 
-Answer the user's question using ONLY the context below.
+        answer = llm_service.ask(prompt)
 
-If the answer is not found in the context, say:
-"I don't have enough information in the provided documents."
+        sources = []
 
-Context:
-{context}
+        for doc in docs:
 
-Question:
-{question}
+            sources.append(
+                {
+                    "file": Path(doc.metadata["source"]).name,
+                    "page": doc.metadata.get("page", 0) + 1,
+                }
+            )
 
-Answer:
-"""
-
-        return llm_service.ask(prompt)
+        return {
+            "answer": answer,
+            "sources": sources,
+        }
 
 
 rag_service = RAGService()

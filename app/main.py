@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from app.api.routes import router
 from app.core.config import APP_NAME
 
+from app.api.upload import router as upload_router
+
 app = FastAPI(title=APP_NAME)
 
 
@@ -24,6 +26,12 @@ app.include_router(
     router,
     prefix="/api/v1",
     tags=["Chat"],
+)
+
+app.include_router(
+    upload_router,
+    prefix="/api/v1",
+    tags=["Upload"],
 )
 
 

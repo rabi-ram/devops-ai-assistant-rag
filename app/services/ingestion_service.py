@@ -7,24 +7,60 @@ from app.vectorstore.chroma_store import chroma_store
 
 class IngestionService:
     """
-    Loads documents and stores them in Chroma.
+    Loads documents, splits them into chunks,
+    and stores them in ChromaDB.
     """
 
-    def ingest_directory(self, directory: str):
+    def ingest_file(self, file_path: str):
+
+        path = Path(file_path)
+
+        print(f"\nProcessing: {path.name}")
+
+        documents = document_loader.load(str(path))
+
+        chunks = chunking_service.split_documents(documents)
+
+        chroma_store.add_documents(chunks)
+
+        print(f"Pages Loaded  : {len(documents)}")
+        print(f"Chunks Created: {len(chunks)}")
+
+        return len(chunks)
+
+    def ingest_directory(self, directory: str, reset_db=False):
+
+        if reset_db:
+            print("\nResetting Chroma database...\n")
+            chroma_store.reset()
 
         directory = Path(directory)
 
-        for file in directory.iterdir():
+        total_files = 0
+        total_chunks = 0
 
-            if file.is_file():
+        print("=" * 60)
+        print("Starting document ingestion")
+        print("=" * 60)
 
-                documents = document_loader.load(str(file))
+        for file in sorted(directory.iterdir()):
 
-                chunks = chunking_service.split_documents(documents)
+            if not file.is_file():
+                continue
 
-                chroma_store.add_documents(chunks)
+            chunks = self.ingest_file(file)
 
-                print(f"Ingested {file.name} ({len(chunks)} chunks)")
+            total_files += 1
+            total_chunks += chunks
+
+        print("\n" + "=" * 60)
+        print("Ingestion Summary")
+        print("=" * 60)
+
+        print(f"Files Processed : {total_files}")
+        print(f"Total Chunks    : {total_chunks}")
+
+        print("=" * 60)
 
 
 ingestion_service = IngestionService()

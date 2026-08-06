@@ -1,15 +1,12 @@
-from app.vectorstore.chroma_store import chroma_store
+from app.services.retrieval_service import retrieval_service
 
-query = "What is a Kubernetes Pod?"
+results = retrieval_service.retrieve_with_score(
+    "What is Terraform workspace?"
+)
 
-results = chroma_store.similarity_search(query)
-
-print(f"Found {len(results)} result(s)\n")
-
-for i, doc in enumerate(results, start=1):
+for document, score in results:
     print("=" * 60)
-    print(f"Result {i}")
-    print("=" * 60)
-    print(doc.page_content)
-    print()
+    print(f"Score: {score}")
+    print(f"Source: {document.metadata}")
+    print(document.page_content[:300])
     

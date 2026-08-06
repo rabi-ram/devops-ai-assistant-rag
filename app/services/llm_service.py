@@ -1,9 +1,13 @@
+import time
+
 from langchain_ollama import ChatOllama
 
 from app.core.config import (
-    OLLAMA_MODEL,
     OLLAMA_BASE_URL,
+    OLLAMA_MODEL,
+    LLM_TEMPERATURE,
 )
+from app.utils.logger import logger
 
 
 class LLMService:
@@ -12,17 +16,32 @@ class LLMService:
     """
 
     def __init__(self):
+
         self.llm = ChatOllama(
             model=OLLAMA_MODEL,
             base_url=OLLAMA_BASE_URL,
-            temperature=0.2,
+             temperature=LLM_TEMPERATURE,
         )
 
     def ask(self, prompt: str) -> str:
-        """
-        Send a prompt to the LLM and return the generated response.
-        """
+
+        logger.info(
+            "Calling Ollama model: %s",
+            OLLAMA_MODEL,
+        )
+
+        start = time.perf_counter()
+
         response = self.llm.invoke(prompt)
+
+        elapsed = time.perf_counter() - start
+
+        logger.info(
+            "LLM response time: %.2f seconds",
+            elapsed,
+        )
+
+        logger.info("Received response from Ollama")
 
         return response.content
 

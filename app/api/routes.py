@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from fastapi import APIRouter
 
 from app.models.chat import ChatRequest, ChatResponse
@@ -9,6 +11,17 @@ router = APIRouter()
 @router.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest):
 
-    response = rag_service.ask(request.question)
+    conversation_id = request.conversation_id or str(uuid4())
 
-    return ChatResponse(**response)
+    response = rag_service.ask(
+        conversation_id=conversation_id,
+        question=request.question,
+    )
+
+    return ChatResponse(
+        conversation_id=conversation_id,
+        answer=response["answer"],
+        sources=response["sources"],
+    )
+
+    
